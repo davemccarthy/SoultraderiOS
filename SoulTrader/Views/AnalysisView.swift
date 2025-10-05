@@ -11,55 +11,54 @@ struct AnalysisView: View {
     @StateObject private var viewModel = AnalysisViewModel()
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Session Summary
-                    if let session = viewModel.session {
-                        SessionSummaryCard(session: session)
-                    }
-                    
-                    // Recommendations
-                    if !viewModel.recommendations.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Recommendations")
-                                .font(.headline)
-                                .padding(.horizontal)
-                            
-                            ForEach(viewModel.recommendations) { rec in
-                                StockRow.recommendationRow(recommendation: rec)
-                            }
+    
+        ScrollView {
+            VStack(spacing: 16) {
+                // Session Summary
+                if let session = viewModel.session {
+                    SessionSummaryCard(session: session)
+                }
+                
+                // Recommendations
+                if !viewModel.recommendations.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Recommendations")
+                            .font(.headline)
+                            .padding(.horizontal)
+                        
+                        ForEach(viewModel.recommendations) { rec in
+                            StockRow.recommendationRow(recommendation: rec)
                         }
-                    } else if !viewModel.isLoading {
-                        Text("No recommendations available")
-                            .foregroundColor(.secondary)
-                            .padding()
                     }
-                    
-                    // Error message
-                    if let error = viewModel.error {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .padding()
-                    }
+                } else if !viewModel.isLoading {
+                    Text("No recommendations available")
+                        .foregroundColor(.secondary)
+                        .padding()
                 }
-                .padding(.vertical)
-            }
-            .navigationTitle("ANALYSIS")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("ANALYSIS")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.purple)
+                
+                // Error message
+                if let error = viewModel.error {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .padding()
                 }
             }
-            .refreshable {
-                await viewModel.loadData()
+            .padding(.vertical)
+        }
+        .navigationTitle("ANALYSIS")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("ANALYSIS")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.purple)
             }
-            .task {
-                await viewModel.loadData()
-            }
+        }
+        .refreshable {
+            await viewModel.loadData()
+        }
+        .task {
+            await viewModel.loadData()
         }
     }
 }

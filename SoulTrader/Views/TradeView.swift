@@ -27,7 +27,7 @@ struct TradeView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
                     // Summary Card (holdings or trades)
@@ -97,14 +97,22 @@ struct TradeView: View {
                     ProgressView()
                 }
             }
-        }
-        .navigationTitle(navigationTitle)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text(navigationTitle)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.purple)
+            .navigationTitle(navigationTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(navigationTitle)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.purple)
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Logout") {
+                        APIService.shared.logout()
+                    }
+                    .foregroundColor(.red)
+                }
             }
         }
     }
@@ -118,7 +126,7 @@ struct TradeView: View {
     }
     
     private var navigationTitle: String {
-        stockSymbol != nil ? stockName?.uppercased() ?? "Trades" : "Trades"
+        stockSymbol != nil ? stockName?.uppercased() ?? "TRADES" : "TRADES"
     }
 }
 

@@ -11,7 +11,7 @@ struct PortfolioView: View {
     @StateObject private var viewModel = PortfolioViewModel()
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
                     // Portfolio Summary Card
