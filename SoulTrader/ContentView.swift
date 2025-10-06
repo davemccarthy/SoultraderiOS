@@ -15,9 +15,45 @@ struct ContentView: View {
     @State private var password = ""
     @State private var isLoggingIn = false
     @State private var loginError: String?
+    @State private var isAttemptingAutoLogin = true
+    
+    init() {
+        // ContentView initialized
+    }
     
     var body: some View {
-        if apiService.isAuthenticated {
+        if isAttemptingAutoLogin {
+            // Auto-login loading screen
+            VStack(spacing: 24) {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
+                    .foregroundColor(.purple)
+                
+                Text("SOULTRADER")
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundColor(.purple)
+                
+                Text("AI Stock Advisor")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .tint(.purple)
+                    .scaleEffect(1.2)
+                
+                Text("Checking credentials...")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .onAppear {
+                Task {
+                    await attemptAutoLogin()
+                }
+            }
+        } else if apiService.isAuthenticated {
             // Main Tab View
             TabView(selection: $selectedTab) {
                 // Tab 1: Portfolio
@@ -114,14 +150,38 @@ struct ContentView: View {
         }
     }
     
+    private func attemptAutoLogin() async {
+        // Small delay to show loading screen
+        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        
+        let success = await apiService.attemptAutoLogin()
+        isAttemptingAutoLogin = false
+        
+        if success {
+            // Auto-login successful, user is now authenticated
+            // Clear any stored username/password from text fields
+            username = ""
+            password = ""
+        } else {
+            // Auto-login failed, pre-fill username if available
+            if let credentials = KeychainService.shared.loadCredentials() {
+                username = credentials.username
+                // Don't pre-fill password for security
+            }
+        }
+    }
+    
     private func login() {
         isLoggingIn = true
         loginError = nil
+        isAttemptingAutoLogin = false // Ensure we're not in auto-login state
         
         Task {
             do {
                 _ = try await apiService.login(username: username, password: password)
                 // Success - apiService.isAuthenticated will trigger view update
+                // Clear password field for security
+                password = ""
             } catch {
                 loginError = error.localizedDescription
             }
@@ -132,11 +192,14 @@ struct ContentView: View {
     private func loginDemo() {
         isLoggingIn = true
         loginError = nil
+        isAttemptingAutoLogin = false // Ensure we're not in auto-login state
         
         Task {
             do {
                 _ = try await apiService.login(username: "demo", password: "demo")
                 // Success - apiService.isAuthenticated will trigger view update
+                // Clear password field for security
+                password = ""
             } catch {
                 loginError = error.localizedDescription
             }

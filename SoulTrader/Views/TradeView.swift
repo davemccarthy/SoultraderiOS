@@ -56,7 +56,7 @@ struct TradeView: View {
                             List {
                                 ForEach(filteredTrades) { trade in
                                     if trade.tradeSource == "SMART_ANALYSIS" {
-                                        NavigationLink(destination: AnalysisDetailView(trade: trade)) {
+                                        NavigationLink(destination: AnalysisView(trade: trade)) {
                                             StockRow.tradeRow(trade: trade)
                                         }
                                     } else {

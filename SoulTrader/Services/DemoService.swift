@@ -624,5 +624,87 @@ class DemoService {
             message: nil
         )
     }
+    
+    func getDemoTradeAnalysis() -> TradeAnalysisResponse {
+        let trade = TradeAnalysisTrade(
+            id: "demo-trade-id",
+            stock: TradeAnalysisStock(
+                symbol: "GOOGL",
+                name: "Alphabet Inc.",
+                logoUrl: "/static/soulstrader/images/logos/GOOGL.png",
+                currentPrice: 150.25
+            ),
+            tradeType: "BUY",
+            quantity: 25,
+            totalAmount: 2500.0,
+            executedAt: Date().addingTimeInterval(-3600),
+            tradeSource: "SMART_ANALYSIS"
+        )
+        
+        let advisorRecommendations = [
+            AdvisorRecommendation(
+                advisorName: "Yahoo Finance Enhanced",
+                recommendationType: "BUY",
+                confidenceScore: 0.87,
+                reasoning: "Strong technical indicators suggest upward momentum with positive earnings growth expected",
+                targetPrice: 180.0
+            ),
+            AdvisorRecommendation(
+                advisorName: "Finnhub Market Intelligence",
+                recommendationType: "BUY",
+                confidenceScore: 0.82,
+                reasoning: "Positive earnings growth expected with strong analyst consensus",
+                targetPrice: 175.0
+            ),
+            AdvisorRecommendation(
+                advisorName: "FMP",
+                recommendationType: "STRONG_BUY",
+                confidenceScore: 0.91,
+                reasoning: "Analyst consensus rating: BUY with strong fundamental metrics",
+                targetPrice: 185.0
+            ),
+            AdvisorRecommendation(
+                advisorName: "Google Gemini",
+                recommendationType: "BUY",
+                confidenceScore: 0.79,
+                reasoning: "Strong fundamentals and market position with AI leadership",
+                targetPrice: 170.0
+            )
+        ]
+        
+        let algorithmSteps = [
+            "Stock GOOGL chosen for consideration from market movers",
+            "4 advisors gave combined confidence score of 0.87",
+            "$2,500 allocated to buy 25 shares based on confidence"
+        ]
+        
+        let technicalDetails = TechnicalDetails(
+            priorityScore: 85.0,
+            confidenceScore: 0.87,
+            recommendationType: "BUY",
+            currentPrice: 150.25,
+            targetPrice: 180.0,
+            stopLoss: 120.0,
+            keyFactors: [
+                "Strong earnings growth",
+                "Positive analyst ratings",
+                "AI leadership position",
+                "Strong balance sheet"
+            ],
+            riskFactors: [
+                "Market volatility",
+                "Regulatory concerns",
+                "Competition in AI space"
+            ],
+            reasoning: "Consolidated analysis from multiple AI advisors showing strong buy signal with high confidence"
+        )
+        
+        return TradeAnalysisResponse(
+            trade: trade,
+            advisorRecommendations: advisorRecommendations,
+            algorithmSteps: algorithmSteps,
+            technicalDetails: technicalDetails
+        )
+    }
 }
 

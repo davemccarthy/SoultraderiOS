@@ -119,7 +119,49 @@ class APIService: ObservableObject {
         self.currentUser = loginResponse.user
         self.isDemoMode = false
         
+        // Store credentials securely for auto-login
+        _ = KeychainService.shared.saveCredentials(username: username, password: password)
+        
         return loginResponse
+    }
+    
+    // MARK: - Auto Login
+    
+    func attemptAutoLogin() async -> Bool {
+        guard let credentials = KeychainService.shared.loadCredentials() else {
+            return false
+        }
+        
+        do {
+            // Use the stored credentials to login (but don't save them again)
+            let url = URL(string: "\(baseURL)/auth/login/")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let body = ["username": credentials.username, "password": credentials.password]
+            request.httpBody = try JSONEncoder().encode(body)
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                throw APIError.invalidResponse
+            }
+            
+            let loginResponse = try jsonDecoder.decode(LoginResponse.self, from: data)
+            
+            // Store token and user (credentials already saved)
+            self.accessToken = loginResponse.access
+            self.currentUser = loginResponse.user
+            self.isDemoMode = false
+            
+            return true
+        } catch {
+            // Auto-login failed, clear stored credentials
+            KeychainService.shared.deleteCredentials()
+            return false
+        }
     }
     
     private func enableDemoMode() -> LoginResponse {
@@ -134,6 +176,9 @@ class APIService: ObservableObject {
         accessToken = nil
         currentUser = nil
         isDemoMode = false
+        
+        // Clear stored credentials
+        KeychainService.shared.deleteCredentials()
     }
     
     // MARK: - Portfolio API
@@ -200,6 +245,18 @@ class APIService: ObservableObject {
         return try await authenticatedRequest(
             endpoint: "/analysis/smart/",
             type: SmartAnalysisResponse.self
+        )
+    }
+    
+    func getTradeAnalysis(tradeId: String) async throws -> TradeAnalysisResponse {
+        if isDemoMode {
+            try await Task.sleep(nanoseconds: 600_000_000) // 0.6 seconds
+            return DemoService.shared.getDemoTradeAnalysis()
+        }
+        
+        return try await authenticatedRequest(
+            endpoint: "/analysis/trade/\(tradeId)/",
+            type: TradeAnalysisResponse.self
         )
     }
     

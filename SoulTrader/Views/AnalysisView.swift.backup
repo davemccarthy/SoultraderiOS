@@ -1,0 +1,205 @@
+//
+//  AnalysisView.swift
+//  SoulTrader
+//
+//  Created on 2025-09-30
+//
+
+import SwiftUI
+
+struct AnalysisView: View {
+    let trade: Trade
+    @StateObject private var viewModel = AnalysisViewModel()
+    
+    var body: some View {
+    
+        ScrollView {
+            VStack(spacing: 16) {
+                // Session Summary
+                if let session = viewModel.session {
+                    SessionSummaryCard(session: session)
+                }
+                
+                // Recommendations
+                if !viewModel.recommendations.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Recommendations")
+                            .font(.headline)
+                            .padding(.horizontal)
+                        
+                        ForEach(viewModel.recommendations) { rec in
+                            // Smart Analysis Summary Card
+                            VStack(spacing: 12) {
+                                // Stock Info Row
+                                HStack(spacing: 12) {
+                                    // Stock Logo
+                                    AsyncImage(url: URL(string: rec.stock.logoUrl ?? "")) { image in
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                    } placeholder: {
+                                        Circle()
+                                            .fill(Color.purple.opacity(0.2))
+                                            .overlay(
+                                                Text(rec.stock.symbol.prefix(2))
+                                                    .font(.caption)
+                                                    .fontWeight(.bold)
+                                                    .foregroundColor(.purple)
+                                            )
+                                    }
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(Circle())
+                                    
+                                    // Stock Symbol and Name
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(rec.stock.symbol)
+                                            .font(.headline)
+                                            .fontWeight(.semibold)
+                                        Text(rec.stock.name)
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                            .lineLimit(1)
+                                    }
+                                    
+                                    Spacer()
+                                }
+                                
+                                Divider()
+                                
+                                // Action and Confidence Row
+                                HStack {
+                                    let actionText = rec.sharesToBuy != nil ? 
+                                        "\(rec.recommendationType) \(rec.sharesToBuy!) shares" : 
+                                        rec.recommendationType
+                                    
+                                    Text(actionText)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(rec.recommendationType == "BUY" ? .green : 
+                                                        rec.recommendationType == "SELL" ? .red : .orange)
+                                    
+                                    Text("•")
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("\(Int(rec.confidenceScore * 100))% confidence")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Spacer()
+                                }
+                                
+                                // Advisor Count and Cash Row
+                                HStack {
+                                    Text("6 advisors") // TODO: Get actual advisor count
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("•")
+                                        .foregroundColor(.secondary)
+                                    
+                                    let cashText = rec.recommendationType == "SELL" ? 
+                                        String(format: "$%.0f from sale", rec.cashAllocated ?? 0) :
+                                        String(format: "$%.0f allocated", rec.cashAllocated ?? 0)
+                                    
+                                    Text(cashText)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(rec.recommendationType == "BUY" ? .green : 
+                                                        rec.recommendationType == "SELL" ? .red : .orange)
+                                    
+                                    Spacer()
+                                }
+                            }
+                            .padding()
+                            .background(Color(.systemBackground))
+                            .cornerRadius(12)
+                            .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+                            .padding(.horizontal)
+                        }
+                    }
+                } else if !viewModel.isLoading {
+                    Text("No recommendations available")
+                        .foregroundColor(.secondary)
+                        .padding()
+                }
+                
+                // Error message
+                if let error = viewModel.error {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .padding()
+                }
+            }
+            .padding(.vertical)
+        }
+        .navigationTitle("ANALYSIS")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("ANALYSIS")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.purple)
+            }
+        }
+        .refreshable {
+            await viewModel.loadData()
+        }
+        .task {
+            await viewModel.loadData()
+        }
+    }
+}
+
+// MARK: - Session Summary Card
+
+struct SessionSummaryCard: View {
+    let session: AnalysisSession
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Latest Analysis")
+                    .font(.headline)
+                Spacer()
+                Text(session.status)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(session.status == "COMPLETED" ? Color.green : Color.orange)
+                    .cornerRadius(4)
+            }
+            
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Recommendations")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(session.totalRecommendations)")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Processing Time")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(session.processingTimeSeconds ?? 0, specifier: "%.1f")s")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .padding(.horizontal)
+    }
+}
+
+
+#Preview {
+    AnalysisView()
+}
