@@ -251,7 +251,7 @@ class APIService: ObservableObject {
     func getTradeAnalysis(tradeId: String) async throws -> TradeAnalysisResponse {
         if isDemoMode {
             try await Task.sleep(nanoseconds: 600_000_000) // 0.6 seconds
-            return DemoService.shared.getDemoTradeAnalysis()
+            return DemoService.shared.getMockTradeAnalysis()
         }
         
         return try await authenticatedRequest(

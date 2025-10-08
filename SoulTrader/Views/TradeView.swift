@@ -48,11 +48,14 @@ struct TradeView: View {
                     
                     // Trades List
                     if !filteredTrades.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text(headerTitle)
                                 .font(.headline)
                                 .padding(.horizontal)
                             
+                            Text("(Tap trade to review analysis)")
+                                .font(.footnote)
+                                .padding(.horizontal)
                             List {
                                 ForEach(filteredTrades) { trade in
                                     if trade.tradeSource == "SMART_ANALYSIS" {
@@ -118,7 +121,7 @@ struct TradeView: View {
     }
     
     private var headerTitle: String {
-        stockName?.uppercased() ?? "Recent Trades"
+        "Trades"
     }
     
     private var emptyMessage: String {

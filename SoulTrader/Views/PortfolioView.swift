@@ -21,11 +21,14 @@ struct PortfolioView: View {
                     
                     // Holdings List
                     if !viewModel.holdings.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Holdings")
                                 .font(.headline)
                                 .padding(.horizontal)
                             
+                            Text("(Tap sttock to review trades)")
+                                .font(.footnote)
+                                .padding(.horizontal)
                             List {
                                 ForEach(viewModel.holdings) { holding in
                                     NavigationLink(destination: TradeView(stockSymbol: holding.stock.symbol, stockName: holding.stock.name, holding: holding)) {

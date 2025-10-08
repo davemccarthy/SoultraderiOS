@@ -285,7 +285,7 @@ class DemoService {
                 totalAmount: 16410.00,
                 commission: 9.99,
                 status: "FILLED",
-                tradeSource: "MOBILE_APP",
+                tradeSource: "SMART_ANALYSIS",
                 executedAt: Date().addingTimeInterval(-86400 * 15),
                 createdAt: Date().addingTimeInterval(-86400 * 15),
                 notes: "AI recommendation - Strong buy signal"
@@ -341,7 +341,7 @@ class DemoService {
                 totalAmount: 19935.00,
                 commission: 9.99,
                 status: "FILLED",
-                tradeSource: "MOBILE_APP",
+                tradeSource: "SMART_ANALYSIS",
                 executedAt: Date().addingTimeInterval(-86400 * 60),
                 createdAt: Date().addingTimeInterval(-86400 * 60),
                 notes: "Initial position - Long term hold"
@@ -397,7 +397,7 @@ class DemoService {
                 totalAmount: 16520.00,
                 commission: 9.99,
                 status: "FILLED",
-                tradeSource: "MOBILE_APP",
+                tradeSource: "SMART_ANALYSIS",
                 executedAt: Date().addingTimeInterval(-86400 * 45),
                 createdAt: Date().addingTimeInterval(-86400 * 45),
                 notes: "Additional position"
@@ -697,6 +697,90 @@ class DemoService {
                 "Competition in AI space"
             ],
             reasoning: "Consolidated analysis from multiple AI advisors showing strong buy signal with high confidence"
+        )
+        
+        return TradeAnalysisResponse(
+            trade: trade,
+            advisorRecommendations: advisorRecommendations,
+            algorithmSteps: algorithmSteps,
+            technicalDetails: technicalDetails
+        )
+    }
+    
+    func getMockTradeAnalysis() -> TradeAnalysisResponse {
+        let trade = TradeAnalysisTrade(
+            id: "mock-trade-id",
+            stock: TradeAnalysisStock(
+                symbol: "AAPL",
+                name: "Apple Inc.",
+                logoUrl: "/static/soulstrader/images/logos/AAPL.png",
+                currentPrice: 185.50
+            ),
+            tradeType: "BUY",
+            quantity: 15,
+            totalAmount: 2782.50,
+            executedAt: Date().addingTimeInterval(-7200), // 2 hours ago
+            tradeSource: "SMART_ANALYSIS"
+        )
+        
+        let advisorRecommendations = [
+            AdvisorRecommendation(
+                advisorName: "Yahoo Finance Enhanced",
+                recommendationType: "BUY",
+                confidenceScore: 0.85,
+                reasoning: "Strong technical indicators show upward momentum with positive earnings growth expected",
+                targetPrice: 210.0
+            ),
+            AdvisorRecommendation(
+                advisorName: "FMP",
+                recommendationType: "STRONG_BUY",
+                confidenceScore: 0.92,
+                reasoning: "Analyst consensus rating: STRONG_BUY with excellent fundamental metrics",
+                targetPrice: 215.0
+            ),
+            AdvisorRecommendation(
+                advisorName: "Google Gemini",
+                recommendationType: "BUY",
+                confidenceScore: 0.78,
+                reasoning: "Strong fundamentals and market position with consistent revenue growth",
+                targetPrice: 205.0
+            ),
+            AdvisorRecommendation(
+                advisorName: "Polygon.io Market Data",
+                recommendationType: "HOLD",
+                confidenceScore: 0.65,
+                reasoning: "Technical indicators suggest neutral position with moderate volatility",
+                targetPrice: 190.0
+            )
+        ]
+        
+        let algorithmSteps = [
+            "Stock AAPL chosen for consideration from high-confidence BUY candidates",
+            "4 advisors gave combined confidence score of 0.80 after conflict adjustments",
+            "$2,783 allocated to buy 15 shares based on adjusted confidence and risk profile"
+        ]
+        
+        let technicalDetails = TechnicalDetails(
+            priorityScore: 88.0,
+            confidenceScore: 0.80,
+            recommendationType: "BUY",
+            currentPrice: 185.50,
+            targetPrice: 210.0,
+            stopLoss: 165.0,
+            keyFactors: [
+                "Strong earnings growth trajectory",
+                "Positive analyst consensus ratings",
+                "Market leadership in technology sector",
+                "Strong balance sheet and cash position",
+                "Innovation pipeline with new product launches"
+            ],
+            riskFactors: [
+                "Market volatility concerns",
+                "Regulatory scrutiny in key markets",
+                "Supply chain dependencies",
+                "Competition in smartphone market"
+            ],
+            reasoning: "Consolidated analysis from multiple AI advisors showing strong buy signal with high confidence. Despite one HOLD recommendation, the overall consensus and strong fundamental metrics support the BUY decision."
         )
         
         return TradeAnalysisResponse(

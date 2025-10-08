@@ -79,7 +79,7 @@ struct AnalysisView: View {
                 .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
                 .padding(.horizontal)
                 
-                // Panel C: Smart Analysis Algorithm Steps (moved to second position)
+                // Panel B: Smart Analysis Algorithm Steps
                 if let tradeAnalysis = viewModel.tradeAnalysis {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Smart Analysis")
@@ -139,7 +139,7 @@ struct AnalysisView: View {
                     }
                 }
                 
-                // Panel B: Advisor Synopsis (moved to third position)
+                // Panel C: Advisor Synopsis
                 if let tradeAnalysis = viewModel.tradeAnalysis {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Advisor Synopsis")
@@ -224,6 +224,202 @@ struct AnalysisView: View {
                         .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
                         .padding(.horizontal)
                     }
+                }
+                
+                // Panel D: Technical Metrics
+                if let tradeAnalysis = viewModel.tradeAnalysis {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Technical Metrics")
+                            .font(.headline)
+                            .padding(.horizontal)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Priority Score:")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("\(Int(tradeAnalysis.technicalDetails.priorityScore))/100")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                            }
+                            
+                            HStack {
+                                Text("Confidence Score:")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("\(Int(tradeAnalysis.technicalDetails.confidenceScore * 100))%")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                            }
+                            
+                            HStack {
+                                Text("Current Price:")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text("$\(tradeAnalysis.technicalDetails.currentPrice, specifier: "%.2f")")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                            }
+                            
+                            if let targetPrice = tradeAnalysis.technicalDetails.targetPrice {
+                                HStack {
+                                    Text("Target Price:")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Text("$\(targetPrice, specifier: "%.2f")")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.green)
+                                }
+                            }
+                            
+                            if let stopLoss = tradeAnalysis.technicalDetails.stopLoss {
+                                HStack {
+                                    Text("Stop Loss:")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Text("$\(stopLoss, specifier: "%.2f")")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.red)
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+                        .padding(.horizontal)
+                    }
+                } else if viewModel.isLoading {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Technical Metrics")
+                            .font(.headline)
+                            .padding(.horizontal)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(0..<5, id: \.self) { _ in
+                                HStack {
+                                    Text("Loading...")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                        .redacted(reason: .placeholder)
+                                    Spacer()
+                                    Text("Loading...")
+                                        .font(.subheadline)
+                                        .redacted(reason: .placeholder)
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemBackground))
+                        .cornerRadius(12)
+                        .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+                        .padding(.horizontal)
+                    }
+                }
+                
+                // Panel E: Trade Details
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Trade Details")
+                        .font(.headline)
+                        .padding(.horizontal)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Trade Type:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(trade.tradeType)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(trade.tradeType == "BUY" ? .green : .red)
+                        }
+                        
+                        HStack {
+                            Text("Order Type:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(trade.orderType)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        
+                        HStack {
+                            Text("Quantity:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(trade.quantity) shares")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        
+                        HStack {
+                            Text("Total Amount:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("$\(trade.totalAmount, specifier: "%.2f")")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        
+                        HStack {
+                            Text("Commission:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("$\(trade.commission, specifier: "%.2f")")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        
+                        HStack {
+                            Text("Status:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(trade.status)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(trade.status == "FILLED" ? .green : .orange)
+                        }
+                        
+                        HStack {
+                            Text("Trade Source:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(trade.tradeSource)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        
+                        if let executedAt = trade.executedAt {
+                            HStack {
+                                Text("Executed:")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text(executedAt.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(12)
+                    .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+                    .padding(.horizontal)
                 }
                 
                 // Error message

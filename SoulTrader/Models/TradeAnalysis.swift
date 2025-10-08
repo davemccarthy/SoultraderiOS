@@ -103,3 +103,4 @@ struct TechnicalDetails: Codable {
         case reasoning
     }
 }
+
