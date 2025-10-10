@@ -104,3 +104,9 @@ struct TechnicalDetails: Codable {
     }
 }
 
+
+
+
+
+
+

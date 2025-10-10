@@ -40,6 +40,12 @@ struct TradesResponse: Codable {
     let results: [Trade]
 }
 
+struct StockTradesResponse: Codable {
+    let symbol: String
+    let count: Int
+    let trades: [Trade]
+}
+
 struct TradeSummary: Codable {
     let totalValue: Double
     let availableCash: Double

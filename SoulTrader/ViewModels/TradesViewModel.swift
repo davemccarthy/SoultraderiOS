@@ -34,5 +34,20 @@ class TradesViewModel: ObservableObject {
         
         isLoading = false
     }
+    
+    func loadTradesForStock(symbol: String) async {
+        isLoading = true
+        error = nil
+        
+        do {
+            let response = try await APIService.shared.getTradesForStock(symbol: symbol)
+            self.trades = response.trades
+        } catch {
+            self.error = error.localizedDescription
+            print("Error loading trades for \(symbol): \(error)")
+        }
+        
+        isLoading = false
+    }
 }
 

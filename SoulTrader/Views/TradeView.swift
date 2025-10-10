@@ -20,9 +20,8 @@ struct TradeView: View {
     }
     
     var filteredTrades: [Trade] {
-        if let stockSymbol = stockSymbol {
-            return viewModel.trades.filter { $0.stock.symbol == stockSymbol }
-        }
+        // When viewing a specific stock, trades are already filtered by API
+        // When viewing all trades, return all trades
         return viewModel.trades
     }
     
@@ -90,10 +89,18 @@ struct TradeView: View {
                 .padding(.vertical)
             }
             .refreshable {
-                await viewModel.loadData()
+                if let stockSymbol = stockSymbol {
+                    await viewModel.loadTradesForStock(symbol: stockSymbol)
+                } else {
+                    await viewModel.loadData()
+                }
             }
             .task {
-                await viewModel.loadData()
+                if let stockSymbol = stockSymbol {
+                    await viewModel.loadTradesForStock(symbol: stockSymbol)
+                } else {
+                    await viewModel.loadData()
+                }
             }
             .overlay {
                 if viewModel.isLoading && viewModel.trades.isEmpty {

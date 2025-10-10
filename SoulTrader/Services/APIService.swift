@@ -234,6 +234,25 @@ class APIService: ObservableObject {
         )
     }
     
+    func getTradesForStock(symbol: String) async throws -> StockTradesResponse {
+        if isDemoMode {
+            try await Task.sleep(nanoseconds: 400_000_000) // 0.4 seconds
+            // Filter demo trades by symbol
+            let allTrades = DemoService.shared.getDemoTrades()
+            let filteredTrades = allTrades.results.filter { $0.stock.symbol == symbol.uppercased() }
+            return StockTradesResponse(
+                symbol: symbol.uppercased(),
+                count: filteredTrades.count,
+                trades: filteredTrades
+            )
+        }
+        
+        return try await authenticatedRequest(
+            endpoint: "/trades/stock/\(symbol)/",
+            type: StockTradesResponse.self
+        )
+    }
+    
     // MARK: - Smart Analysis API
     
     func getSmartAnalysis() async throws -> SmartAnalysisResponse {
